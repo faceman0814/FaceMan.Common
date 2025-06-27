@@ -55,10 +55,32 @@ namespace FaceMan.DynamicWebAPI
                     controller.ControllerName = controller.ControllerName.RemovePostFix(findPostfix);
                 }
 
+                // 动态控制器命名约定：I{ServiceName} 接口
+                var interfaceName = $"I{controller.ControllerType.Name}";
+
+                // 在程序集中查找匹配的接口
+                var serviceInterface = controller.ControllerType.Assembly
+                    .GetTypes()
+                    .FirstOrDefault(t =>
+                        t.IsInterface &&
+                        t.Name == interfaceName &&
+                        typeof(IApplicationService).IsAssignableFrom(t));
+
+                MethodInfo[] methods = [];
+                //拿这个接口的方法定义
+                if (serviceInterface != null)
+                {
+                    methods = serviceInterface.GetMethods();
+                }
+
                 //Actions就是接口的方法
                 foreach (var item in controller.Actions)
                 {
-                    ConfigureSelector(controller.ControllerName, item);
+                    var action = methods.FirstOrDefault(t => t.Name == item.ActionName);
+                    if (action != null)
+                    {
+                        ConfigureSelector(controller.ControllerName, item);
+                    }
                 }
             }
         }

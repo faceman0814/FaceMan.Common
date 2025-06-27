@@ -29,6 +29,9 @@ namespace FaceMan.DynamicWebAPI
             builder.ConfigureApplicationPartManager(applicationPartManager =>
             {
                 applicationPartManager.FeatureProviders.Add(new ApplicationServiceControllerFeatureProvider());
+                //applicationPartManager.FeatureProviders.Add(new ApplicationServiceControllerFeatureProvider());
+                //applicationPartManager.FeatureProviders.Clear();
+                //applicationPartManager.FeatureProviders.Add(new UnifiedControllerFeatureProvider());
             });
 
             // 配置MvcOptions，添加自定义的应用程序模型约定
@@ -57,6 +60,8 @@ namespace FaceMan.DynamicWebAPI
             builder.ConfigureApplicationPartManager(applicationPartManager =>
             {
                 applicationPartManager.FeatureProviders.Add(new ApplicationServiceControllerFeatureProvider());
+                //applicationPartManager.FeatureProviders.Clear();
+                //applicationPartManager.FeatureProviders.Add(new UnifiedControllerFeatureProvider());
             });
 
             // 配置MvcOptions，添加自定义的应用程序模型约定

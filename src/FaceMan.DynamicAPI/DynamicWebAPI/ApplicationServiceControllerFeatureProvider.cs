@@ -1,10 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FaceMan.DynamicWebAPI;
+using FaceMan.DynamicWebAPI.Filters;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace FaceMan.DynamicWebAPI
 {
@@ -48,13 +61,12 @@ namespace FaceMan.DynamicWebAPI
             if (typeInfo.IsPublic && !typeInfo.IsAbstract && !typeInfo.IsGenericType && !typeInfo.IsInterface)
             {
                 // 检查类型是否继承自IApplicationService，或标记了DynamicWebApiAttribute，或继承自ControllerBase或Controller
-                bool isAssignableToIApplicationService = typeof(IApplicationService).IsAssignableFrom(type);
-                bool hasDynamicWebApiAttribute = type.IsDefined(typeof(DynamicWebApiAttribute), true);
-                bool isDerivedFromControllerBase = type.BaseType == typeof(ControllerBase);
-                bool isDerivedFromController = type.BaseType == typeof(Controller);
 
                 // 任一条件满足即视为Controller
-                if (isAssignableToIApplicationService || hasDynamicWebApiAttribute || isDerivedFromControllerBase || isDerivedFromController)
+                if (typeof(IApplicationService).IsAssignableFrom(type) ||
+                     type.IsDefined(typeof(DynamicWebApiAttribute), true) ||
+                     type.BaseType == typeof(Controller) ||
+                     type.BaseType == typeof(ControllerBase))
                 {
                     return true;
                 }
