@@ -112,7 +112,7 @@ namespace FaceMan.DynamicWebAPI.Extensions
                 return $"{CustomSchemaIdSelector(dataType)}ApiResponse";
             }
 
-            // 2. 处理其他泛型类型（保持你原有的逻辑）
+            // 2. 处理其他泛型类型
             if (modelType.IsConstructedGenericType)
             {
                 var prefix = modelType.GetGenericArguments()
@@ -122,7 +122,7 @@ namespace FaceMan.DynamicWebAPI.Extensions
                 return prefix + modelType.FullName.Split('`').First();
             }
 
-            // 3. 处理非泛型类型（保持你原有的逻辑）
+            // 3. 处理非泛型类型
             return modelType.FullName.Replace("[]", "Array");
 
             //if (!modelType.IsConstructedGenericType) return modelType.FullName.Replace("[]", "Array");
