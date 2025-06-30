@@ -57,7 +57,7 @@ namespace FaceMan.DynamicWebAPI.Extensions
 
                 //使Post请求的Body参数在Swagger UI中以Json格式显示。
                 options.OperationFilter<JsonBodyOperationFilter>();
-               
+
 
                 if (param.EnableSimpleToken)
                 {
@@ -65,8 +65,9 @@ namespace FaceMan.DynamicWebAPI.Extensions
                     options.OperationFilter<SwaggerHttpHeaderFilter>();
                 }
 
-                //自定义SchemaId，避免冲突
+                //自定义Schema出入参名称，避免冲突
                 options.CustomSchemaIds(CustomSchemaIdSelector);
+
                 ////显示枚举值
                 options.DescribeAllEnumsAsStrings();
                 //添加自定义文档信息
