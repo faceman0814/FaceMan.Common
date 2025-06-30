@@ -45,12 +45,19 @@ namespace FaceMan.DynamicWebAPI.Extensions
             {
                 //添加响应头信息。它可以帮助开发者查看 API 响应中包含的 HTTP 头信息，从而更好地理解 API 的行为。
                 options.OperationFilter<AddResponseHeadersFilter>();
+
                 //摘要中添加授权信息。它会在每个需要授权的操作旁边显示一个锁图标，提醒开发者该操作需要身份验证。
                 options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+
                 //加安全需求信息。它会根据 API 的安全配置（如 OAuth2、JWT 等）自动生成相应的安全需求描述，帮助开发者了解哪些操作需要特定的安全配置。
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+                //包装响应体。它会将 API 的响应体包装在一个统一的格式中，通常包括状态码、消息和数据等字段，以便于前端处理和展示。
+                options.OperationFilter<WrapResponseOperationFilter>();
+
                 //使Post请求的Body参数在Swagger UI中以Json格式显示。
                 options.OperationFilter<JsonBodyOperationFilter>();
+               
 
                 if (param.EnableSimpleToken)
                 {
@@ -97,13 +104,34 @@ namespace FaceMan.DynamicWebAPI.Extensions
         /// <returns></returns>
         static string CustomSchemaIdSelector(Type modelType)
         {
-            if (!modelType.IsConstructedGenericType) return modelType.FullName.Replace("[]", "Array");
+            // 1. 特别处理 ApiResponse<T> 类型
+            if (modelType.IsGenericType &&
+                modelType.GetGenericTypeDefinition() == typeof(ApiResponse<>))
+            {
+                var dataType = modelType.GetGenericArguments()[0];
+                return $"{CustomSchemaIdSelector(dataType)}ApiResponse";
+            }
 
-            var prefix = modelType.GetGenericArguments()
-                .Select(genericArg => CustomSchemaIdSelector(genericArg))
-                .Aggregate((previous, current) => previous + current);
+            // 2. 处理其他泛型类型（保持你原有的逻辑）
+            if (modelType.IsConstructedGenericType)
+            {
+                var prefix = modelType.GetGenericArguments()
+                    .Select(genericArg => CustomSchemaIdSelector(genericArg))
+                    .Aggregate((previous, current) => previous + current);
 
-            return prefix + modelType.FullName.Split('`').First();
+                return prefix + modelType.FullName.Split('`').First();
+            }
+
+            // 3. 处理非泛型类型（保持你原有的逻辑）
+            return modelType.FullName.Replace("[]", "Array");
+
+            //if (!modelType.IsConstructedGenericType) return modelType.FullName.Replace("[]", "Array");
+
+            //var prefix = modelType.GetGenericArguments()
+            //    .Select(genericArg => CustomSchemaIdSelector(genericArg))
+            //    .Aggregate((previous, current) => previous + current);
+
+            //return prefix + modelType.FullName.Split('`').First();
         }
         /// <summary>
         /// 启用Swagger
